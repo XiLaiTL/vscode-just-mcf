@@ -1,0 +1,128 @@
+{
+  "name": "vscode-just-mcf",
+  "displayName": "Just MCF",
+  "icon": "icon.png",
+  "description": "A language framework on Minecraft Java Edition datapack mcfunction improvement",
+  "version": "0.0.1",
+  "publisher": "XiLaiTL",
+  "author": "XiLaiTL",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/XiLaiTL/vscode-just-mcf.git"
+  },
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "keywords": [
+    "minecraft",
+    "mcfunction",
+    "datapack",
+    "mcf",
+    "justmcf"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "menus": {
+      "view/item/context": [
+        {
+          "command": "justMCFTask.run",
+          "group": "inline",
+          "when": "view == justMCFTask && viewItem == task"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "justMCFTask.refresh",
+          "group": "navigation",
+          "when": "view == justMCFTask"
+        }
+      ]
+    },
+    "views": {
+      "explorer": [
+        {
+          "id": "justMCFTask",
+          "name": "JustMCF Task",
+          "contextualTitle": "Minecraft Mcfunction",
+          "icon": "$(three-bars)",
+          "when": "justMCFTask.show"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "justMCFTask.refresh",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "justMCFTask.run",
+        "title": "Run",
+        "icon": "$(debug-start)"
+      }
+    ],
+    "languages": [
+      {
+        "id": "mcf",
+        "aliases": [
+          "Just MCF",
+          "mcf"
+        ],
+        "extensions": [
+          ".mcf"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "mcf",
+        "scopeName": "source.mcf",
+        "path": "./syntaxes/mcf.tmLanguage.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.js": "javascript",
+          "meta.embedded.block.mcfunction": "mcfunction"
+        }
+      }
+    ]
+  },
+  "activationEvents": [
+    "workspaceContains:**/pack.mcmeta",
+    "workspaceContains:**/mcf.mcmeta",
+    "workspaceContains:**/*.mcfunction",
+    "workspaceContains:**/*.mcf",
+    "onLanguage:mcfunction"
+  ],
+  "scripts": {
+    "js2yml": "npx js-yaml syntaxes/mcf.tmLanguage.json > syntaxes/mcf.tmLanguage.test.yaml",
+    "yml2js": "npx js-yaml syntaxes/mcf.tmLanguage.yaml > syntaxes/mcf.tmLanguage.json",
+    "require2import": "node ./src/lib/RequireToImport.js ./out",
+    "vscode:prepublish": "pnpm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "pnpm run compile && pnpm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.0.1",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "16.x",
+    "@types/vscode": "^1.75.0",
+    "@typescript-eslint/eslint-plugin": "^5.49.0",
+    "@typescript-eslint/parser": "^5.49.0",
+    "@vscode/test-electron": "^2.2.2",
+    "eslint": "^8.33.0",
+    "glob": "^8.1.0",
+    "js-yaml": "^4.1.0",
+    "mocha": "^10.1.0",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "just-mcf": "^0.0.6"
+  }
+}

@@ -1,0 +1,671 @@
+# yaml-language-server:$schema=tmLanguage.json
+$schema: https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json
+name: Just MCF
+scopeName: source.mcf
+fileTypes: [mcf]
+
+patterns:
+  - include: '#everywhere'
+  - include: '#mcf-file'
+
+repository:
+  comment:
+    patterns:
+    - name: comment.block.mcf
+      begin: '\#='
+      beginCaptures:
+        '0': { name: punctuation.definition.comment.mcf }
+      end: '=\#'
+      endCaptures:
+        '0': { name: punctuation.definition.comment.mcf }
+    - name: comment.line.double-slash.mcf
+      match: '##.*$'
+    - name: comment.line.number-sign.mcf
+      match: '^\s*\#\s.*$'
+  script:
+    begin: \{\{
+    beginCaptures:
+      '0': { name: punctuation.curlybrace.open.mcf } 
+    end: \}\}
+    endCaptures:
+      '0': { name: punctuation.curlybrace.close.mcf }
+    name: meta.embedded.block.js
+    patterns:
+      - include: source.js
+      # - begin: \#\{
+      #   end: \}\#
+      #   patterns:
+      #     - include: '#statement-inner'
+  everywhere:
+    patterns:
+      - include: '#comment'
+      - include: '#script'
+  mcf-file:
+    patterns:
+      - include: '#everywhere'
+      - include: '#file-statement-inner'
+    
+  file-statement-inner:
+    patterns:
+      - include: '#everywhere'
+      - include: '#namespace-statement'
+      - include: '#namespace-statement-inner'
+  namespace-statement-inner:
+    patterns:
+      - include: '#everywhere'
+      - include: '#func-tag-statement'
+      - include: '#func-tag-statement-inner'
+      - include: '#interface-statement'
+      - include: '#namespace-statement'
+  func-tag-statement-inner:
+    patterns:
+      - include: '#everywhere'
+      - include: '#func-statement'                                                                                                                                              
+      - include: '#func-run-statement'                                                                                                                                           
+      - include: '#func-improve-statement'                                                                                                                                      
+      - include: '#func-tag-statement'
+  statement-inner:
+    patterns:
+      - include: '#everywhere'
+      - include: '#statement'
+      - include: '#no-in-exec-statement'
+    
+  statement:
+    patterns:
+      - include: '#everywhere'
+      - include: '#data-operation-expression'
+      - include: '#if-statement'
+      - include: '#for-statement'
+      - include: '#while-statement'
+      - include: '#exec-run-part'
+      - include: '#exec-statement'
+      - include: '#namespace-statement'
+      - include: '#func-improve-run-statement'
+      - include: '#yield-statement'
+      - include: '#return-statement'
+      - include: '#break-statement'
+      - include: '#continue-statement'
+      - include: '#data-assign-exist-expression'
+      - include: '#scb-operation-expression'
+      - include: '#bossbar-operation-expression'
+      - include: '#entity-expression'
+      - include: '#common-operators'
+      - include: '#token-and-block'
+      - include: '#leagal-command'
+      
+
+
+      # - include: '#data-statement'
+      # - include: '#scb-player-statement'
+      # - include: '#scb-objective-statement'
+      # - include: '#title-statement'
+      # - include: '#bossbar-statement'
+      # - include: '#display-statement'
+      # - include: '#loot-statement'
+      # - include: '#item-statement'
+      # - include: '#attr-statement'
+      # - include: '#entity-statement'
+      # - include: '#block-statement'
+  no-in-exec-statement:
+    patterns:
+      - include: '#func-statement'                                                                                                                                             
+      - include: '#direct-func-statement'                                                                                                                                    
+      - include: '#func-improve-statement'                                                                                                                                       
+      - include: '#interface-statement'                                                                                                                                       
+      - include: '#statement-store-expression'
+      - include: '#everywhere'
+  func-improve-statement:
+    patterns:
+      - include: ''
+  func-statement:
+    patterns:
+      - match: (\bfunc\b)\s+(\#[_[:alpha:]][_\-.[:alnum:]]*(?::[_\-.[:alnum:]]+(?:/[_\-.[:alnum:]]+)*)?)\s*;
+        captures:
+          '1': { name: keyword.other.function.mcf }
+          '2': { name: entity.name.class.mcf }
+      - match: (\bfunc\b)\s+([_[:alpha:]][_\-.[:alnum:]]*(?::[_\-.[:alnum:]]+(?:/[_\-.[:alnum:]]+)*)?)\s*;
+        captures:
+          '1': { name: keyword.other.function.mcf }
+          '2': { name: entity.name.function.mcf }
+      - begin: (?=\bfunc\b)
+        end: (?<=\})
+        patterns: 
+          - begin: |-
+              (?x)
+              \b(func)\b\s+
+              ([_[:alpha:]][_\-.[:alnum:]]*(?::[_\-.[:alnum:]]+(?:/[_\-.[:alnum:]]+)*)?)\s*
+            beginCaptures:
+              '1': { name: keyword.other.function.mcf }
+              '2': { name: entity.name.function.mcf }
+            end: (?=\{)
+            patterns:
+              - include: '#tagged-part'
+          - begin: \{
+            beginCaptures:
+              '0': { name: punctuation.curlybrace.open.mcf }
+            end: \}
+            endCaptures:
+              '0': { name: punctuation.curlybrace.close.mcf }
+            patterns:
+              - include: '#statement-inner'
+  func-tag-statement:
+    begin: (?=\bfunc\b\s*\#)
+    end: (?<=\})
+    patterns:
+      - begin: |-
+          (?x)
+          \b(func)\b\s+
+          (\#[_[:alpha:]][_\-.[:alnum:]]*(?::[_\-.[:alnum:]]+(?:/[_\-.[:alnum:]]+)*)?)\s*
+        beginCaptures:
+          '1': { name: keyword.other.class.mcf }
+          '2': { name: entity.name.class.mcf }
+        end: (?=\{)
+        patterns:
+          - include: '#tagged-part'
+      - begin: \{
+        beginCaptures:
+          '0': { name: punctuation.curlybrace.open.mcf }
+        end: \}
+        endCaptures:
+          '0': { name: punctuation.curlybrace.close.mcf }
+        patterns:
+          - include: '#func-tag-statement-inner'
+  tagged-part:
+    begin: \b(tagged)\b\s+
+    beginCaptures:
+      '1': { name: keyword.other.class.mcf }
+    end: (?=\{)
+    patterns:
+      - match: (\#[_[:alpha:]][_\-.[:alnum:]]*(?::[_\-.[:alnum:]]+(?:/[_\-.[:alnum:]]+)*)?),?
+        captures:
+          '1': { name: entity.name.class.mcf }
+  direct-func-statement:
+    patterns:
+      - include: ''
+  interface-statement:
+    begin: '\b(interface)\b\s'
+    beginCaptures:
+      '1': { name: keyword.other.interface.mcf }
+    end: (?<=\})
+    patterns:
+      - match: (?<namespace_id>[_[:alpha:]][_\-.[:alnum:]]*(?::[_\-.[:alnum:]]+(?:/[_\-.[:alnum:]]+)*)?)
+        name: entity.name.type.mcf
+      - include: '#data-identifier'
+      - include: 'source.mcfunction#nbt.value'
+  inner-type:
+    match: \b(byte|short|int|long|float|double)\b
+    name: entity.name.type.mcf
+  if-statement:
+    patterns:
+      - match: (?<![_[:alnum:]])(?<!\.)\b(if|else)\b(?![_[:alnum:]])(?!\.)
+        name: keyword.control.conditional.if.mcf   
+      - include: '#exist-expression'
+      - include: '#exec-run-part'                                                                                                 
+  for-statement:
+    begin: (?=\bfor\b)
+    end: (?<=\})
+    patterns:
+      - begin: |-
+          (?x)
+          \b(for)\b\s*
+          \{
+        beginCaptures:
+          '1': { name: keyword.control.loop.for.mcf }
+        end: (?=\})
+        patterns:
+          - include: '#data-operation-expression'
+  while-statement:
+    patterns:
+      - match: (?<![_[:alnum:]])(?<!\.)\b(while)\b(?![_[:alnum:]])(?!\.)
+        name: keyword.control.loop.while.mcf    
+      - include: '#exist-expression'
+      - include: '#exec-run-part'
+  namespace-statement:
+    begin: (?=\b(namespace|namsp)\b)
+    end: (?<=\})
+    patterns:
+      - begin: |-
+          (?x)
+          \b(namespace|namsp)\b\s+
+          ([_[:alpha:]][_\-.[:alnum:]]*)\s*
+        beginCaptures:
+          '1': { name: keyword.other.class.mcf }
+          '2': { name: entity.name.class.mcf }
+        end: (?=\{)
+      - begin: \[
+        end: \]
+        patterns:
+          - match: ([_[:alpha:]]+)\s*=\s*([_[:alpha:]][_\-.[:alnum:]]*),?
+            captures:
+              '1': { name: support.type.property-name.namespace.mcf }
+              '2': { name: entity.name.class.mcf }
+      - begin: \{
+        beginCaptures:
+          '0': { name: punctuation.curlybrace.open.mcf }
+        end: \}
+        endCaptures:
+          '0': { name: punctuation.curlybrace.close.mcf }
+        patterns:
+          - include: '#namespace-statement-inner'
+  func-improve-run-statement:
+    patterns:
+      - include: ''
+  yield-statement:
+    patterns:
+      - match: (?<![_[:alnum:]])(?<!\.)\b(yield)\b(?![_[:alnum:]])(?!\.)
+        name: keyword.control.return.mcf
+      - include: '#data-identifier'
+  return-statement:
+    patterns:
+      - match: (?<![_[:alnum:]])(?<!\.)\b(return)\b(?![_[:alnum:]])(?!\.)
+        name: keyword.control.return.mcf
+      - include: '#data-identifier'
+  break-statement:
+    patterns:
+      - match: (?<![_[:alnum:]])(?<!\.)\b(break)\b(?![_[:alnum:]])(?!\.)
+        name: keyword.control.loop.mcf
+  continue-statement:
+    patterns:
+      - match: (?<![_[:alnum:]])(?<!\.)\b(continue)\b(?![_[:alnum:]])(?!\.)
+        name: keyword.control.loop.mcf
+  exec-statement:
+    patterns:
+      - begin: (\bexec\b)\s*(?=\{)
+        beginCaptures:
+          '1': { name: keyword.control.mcf }
+        end: (?<=\})
+        patterns:
+          - include: '#exec-child-part'
+      - begin: (?=\{)
+        end: (?<=\})(?=\s*\n?(run|->|\??=>|(\??\bstore\b(?:\s?\b(?:result|success)\b)?)))
+        patterns:
+          - include: '#exec-child-part'
+      - include: '#exec-store-part'
+      - include: '#exec-run-part'
+  exec-store-part:
+    patterns:
+      - begin: \?=>|=>|\?
+        beginCaptures:
+          '0': { name: keyword.operator.store.mcf } 
+        end: '$'
+        patterns:
+          - include: '#bossbar-identifier'
+          - include: '#scb-identifier'
+          - include: '#data-identifier'
+          - match: '([:alnum:]+)\s*\*?([0-9]+)'
+            captures:
+              '1': { patterns: [{ include: '#inner-type'}]}
+              '2': { patterns: [{ include: 'source.mcfunction#command.token.number'}]}
+      - begin: (\??\bstore\b(?:\s?\b(?:result|success)\b)?)
+        beginCaptures:
+          '1': {name: entity.name.mcf}
+        end: '$'
+        patterns:
+          - include: '#bossbar-identifier'
+          - include: '#scb-identifier'
+          - include: '#data-identifier'
+          - match: '([:alnum:]+)\s*\*?([0-9]+)'
+            captures:
+              '1': { patterns: [{ include: '#inner-type'}]}
+              '2': { patterns: [{ include: 'source.mcfunction#command.token.number'}]}
+  exec-run-part:
+    patterns:
+      - match: \brun\b|->\s*(?!\{)
+        captures:
+          '0': { name: keyword.operator.run.mcf }
+      - begin: \brun\b|->
+        beginCaptures:
+          '0': { name: keyword.operator.run.mcf }
+        end: (?<=\})
+        patterns:
+          - begin: \{
+            end: \}
+            patterns:
+              - include: '#statement-inner'
+
+
+  exec-child-part:
+    begin: (?=\{)
+    end: (?<=\})
+    patterns:
+      - begin: \{
+        end: \}
+        patterns:
+          - include: '#exec-store-part'
+          - include: '#data-identifier'
+          - include: '#scb-identifier'
+          - include: '#scb-compare-operators'
+        #- include: 'source.mcfunction#command.tokens'
+  exist-expression:
+    patterns:
+      - include: '#exec-child-part'
+      - include: '#exist-operators'
+  json-value:
+    patterns:
+      - begin: 'j\{'
+        end: '\}'
+        name: string.unquoted
+      - begin: 'j\['
+        end: '\]'
+        name: string.unquoted
+  nbt-value:
+    patterns:
+      - begin: 'n\{'
+        beginCaptures:
+          '0': {name: variable.language.mcf}
+        end: '\}'
+        endCaptures:
+          '0': {name: variable.language.mcf}
+        patterns:
+          - include: '#nbt.compound'
+      - begin: '(n\[)(\w*;)?'
+        beginCaptures:
+          '1': {name: variable.language.mcf}
+          '2': {name: variable.language.mcf}
+        end: '\]'
+        endCaptures:
+          '0': {name: variable.language.mcf}
+        patterns:
+          - include: '#nbt.list'
+  nbt.compound:
+    patterns:
+      - match: ' +'
+      - begin: '(,)? *([A-Za-z0-9_\.\-]+|\"[^\n\"]+\") *(\:) *'
+        end: ' *(?=[\}\,])'
+        beginCaptures:
+          '1': {name: variable.language.mcfunction}
+          '2': {name: string.interpolated.mcfunction}
+          '3': {name: variable.language.mcfunction}
+        patterns:
+          - include: '#nbt.value'
+  nbt.list:
+    patterns:
+      - match: ' +'
+      - begin: '(,)? *(?=[^\n\]\,])'
+        end: ' *(?=[\]\,])'
+        beginCaptures:
+          '1': {name: variable.language.mcfunction}
+        patterns:
+          - include: '#nbt.value'
+  nbt.value:
+    patterns:
+      - begin: '(\{)'
+        end: '(\})'
+        beginCaptures:
+          '1': {name: variable.language.mcfunction}
+        endCaptures:
+          '1': {name: variable.language.mcfunction}
+        patterns:
+          - include: '#nbt.compound'
+      - begin: '(\[)(\w*;)?'
+        end: '(\])'
+        beginCaptures:
+          '1': {name: variable.language.mcfunction}
+          '2': {name: variable.language.mcfunction}
+        endCaptures:
+          '1': {name: variable.language.mcfunction}
+        patterns:
+          - include: '#nbt.list'
+      - begin: (\")
+        end: (\")
+        beginCaptures:
+          '1': {name: string.quoted.mcfunction}
+        endCaptures:
+          '1': {name: string.quoted.mcfunction}
+        patterns:
+          - include: '#common.quoted_string'
+      - begin: (\')
+        end: (\')
+        beginCaptures:
+          '1': {name: string.quoted.mcfunction}
+        endCaptures:
+          '1': {name: string.quoted.mcfunction}
+        patterns:
+          - include: '#common.single_quoted_string'
+      - match: (true|false)
+        name: constant.numeric.mcfunction
+      - match: (\-?\d*\.?\d+)
+        name: constant.numeric.mcfunction
+      - match: '([^\s\{\}\[\]\,\:\=]+)'
+        name: string.unquoted.mcfunction
+
+  token-and-block:
+    patterns:
+      - begin: \b(block|entity|attr|scb|item|data|display|title|loot)\b\s*((?:\@|\#).+)?[ \n]*\{
+        beginCaptures:
+          '1': { name: keyword.control.mcf}
+          '2': { patterns: [ { include: '#selector'} ]}
+        end: \}
+        patterns:
+          - include: "#statement-inner"
+      - match: \b(block|entity|attr|scb|item|data|display|title|loot)\b
+        name: keyword.control.mcf
+      - match: \bdefault\b
+        name: constant.character.mcf
+
+  # data-statement:
+  #   patterns:
+  #     - include: ''
+  # scb-player-statement:
+  #   patterns:
+  #     - include: ''
+  # scb-objective-statement:
+  #   patterns:
+  #     - include: ''
+  # title-statement:
+  #   patterns:
+  #     - include: ''
+  # bossbar-statement:
+  #   patterns:
+  #     - include: ''
+  # display-statement:
+  #   patterns:
+  #     - include: ''
+  # loot-statement:
+  #   patterns:
+  #     - include: ''
+  # item-statement:
+  #   patterns:
+  #     - include: ''
+  # attr-statement:
+  #   patterns:
+  #     - include: ''
+  # entity-statement:
+  #   patterns:
+  #     - include: ''
+  # block-statement:
+  #   patterns:
+  #     - include: ''
+  data-operation-expression:
+    patterns:
+      - include: '#data-identifier'
+      - include: '#data-operators'
+      - include: '#nbt-value'
+      - include: '#json-value'
+      #       - include: '#namespace-id'
+      # - include: 'source.mcfunction#nbt.value'
+  data-assign-exist-expression:
+    patterns:
+      - include: ''
+  scb-operation-expression:
+    patterns:
+      - include: '#scb-identifier'
+      - include: '#scb-operators'
+      - include: 'source.mcfunction#command.token.number'
+  bossbar-operation-expression:
+    patterns:
+      - include: '#bossbar-identifier'
+      - match: '\b(max|player|value|visible)\b'
+        name: keyword.operator.new
+      - include: 'source.mcfunction#command.token.number'
+      - include: '#assign-operator'
+  entity-expression:
+    patterns:
+      - include: '#selector'
+      - match: \.([_[:alpha:]]*)
+        captures:
+          '1': { name: keyword.control.command.mcf}
+      
+  leagal-command:
+    name: meta.embedded.block.mcfunction
+    begin: (?:^|\G)\s*(?=(advancement|attribute|ban|ban-ip|banlist|clear|clone|datapack|debug|defaultgamemode|deop|difficulty|effect|enchant|execute|experience|fill|fillbiome|forceload|function|gamemode|gamerule|give|help|jfr|kick|kill|list|locate|me|msg|op|pardon|pardon-ip|particle|perf|place|playsound|publish|recipe|reload|save-all|save-off|save-on|say|schedule|scoreboard|seed|setblock|setidletimeout|setworldspawn|spawnpoint|spectate|spreadplayers|stop|stopsound|summon|tag|team|teammsg|teleport|tell|tellraw|time|tm|tp|trigger|w|weather|whitelist|worldborder|xp)\b)
+    beginCaptures: 
+      '1': { name: keyword.control.mcfunction }
+    end: $|\?=>|=>
+    patterns:
+      - begin: (?<= )
+        end: '[ \n]'
+        contentName: meta.command.token.mcfunction
+        patterns:
+          - include: 'source.mcfunction#command.tokens'
+
+  statement-store-expression:
+    patterns:
+      - include: '#exec-store-part'
+  selector:
+    patterns:
+      - match: '(\@[a-z])(?=[ \n]|$|\.|:|::)'
+        captures:
+          '1': {name: support.class.mcf}
+      - begin: '(\@[a-z])(\[)'
+        end: '(?<=\])'
+        beginCaptures:
+          '1': {name: support.class.mcfunction}
+          '2': {name: support.class.mcfunction}
+        patterns:
+          - name: meta.selector.argument_spacing.mcfunction
+            match: ' +'
+          - name: meta.selector.argument.mcfunction
+            begin: |-
+              ((?:[a-z_][a-z0-9_]*)|(?:"[^"
+              ]*")|(?:\'[^\'
+              ]*\')) *(\=) *(\!)? *
+            end: '\]'
+            endCaptures:
+              '0': {name: support.class.mcfunction}
+            beginCaptures:
+              '1': {name: variable.other.mcfunction}
+              '2': {name: support.class.mcfunction}
+              '3': {name: keyword.control.mcfunction}
+            patterns:
+              - include: 'source.mcfunction#selector.argument.resource_location'
+              - include: 'source.mcfunction#selector.argument.tagged_resource_location'
+              - include: 'source.mcfunction#selector.argument.range'
+              - include: 'source.mcfunction#selector.argument.number'
+              - include: 'source.mcfunction#selector.argument.boolean'
+              - include: 'source.mcfunction#selector.argument.property_map'
+              - include: 'source.mcfunction#selector.argument.nbt_compound'
+              - include: 'source.mcfunction#selector.argument.quoted_string'
+              - include: 'source.mcfunction#selector.argument.single_quoted_string'
+              - include: 'source.mcfunction#selector.argument.unquoted_string'
+              - include: 'source.mcfunction#selector.argument.unknown'
+      - match: '(\@[_[:alpha:]][_[:alnum:]]*)(?=[ \n]|$|\.|:|::)'
+        captures:
+          '1': {name: support.class.mcf}
+      - include: '#fake-playername'
+  namespace-id:
+    match: ([_[:alpha:]][_\-.[:alnum:]]*(?::[_\-.[:alnum:]]+(?:/[_\-.[:alnum:]]+)*)?)
+    name: variable.other.namespaces.mcf
+  fake-playername:
+    match: '(\#[_[:alpha:]][_[:alnum:]]*)(?=[ \n]|$|\.|:|::)'
+    captures:
+          '1': {name: support.class.mcf}
+  bossbar-identifier:
+    patterns:
+      - begin: '\b(bossbar)\b (?<namespace_id>[_[:alpha:]][_\-.[:alnum:]]*(?::[_\-.[:alnum:]]+(?:/[_\-.[:alnum:]]+)*)?)\s'
+        beginCaptures:
+          '1': { name: entity.name.type.mcf }
+          '2': { name: variable.other.bossbar.mcf}
+        end: (?<=[ \n]|$)
+  scb-identifier:
+    patterns:
+      - begin: '([_[:alpha:]][_\-.[:alnum:]]*)(?=\@|\#)'
+        beginCaptures:
+          '1': { name: variable.name.scb.mcf}
+        end: (?<=[ \n]|$)
+        patterns:
+          - include: '#selector'
+  data-identifier:
+    patterns:
+      - begin: 'local::'
+        beginCaptures:
+          '1': { name: support.type.local.mcf}
+        end: (?<=[ \n]|$)
+        patterns:
+          - include: 'source.mcfunction#nbt_path.property'
+      - begin: '([_[:alpha:]][_\-.[:alnum:]]*(?::[_\-.[:alnum:]]+(?:/[_\-.[:alnum:]]+)*)?)\s*::'
+        beginCaptures:
+          '1': { name: variable.other.storage.mcf}
+        end: (?<=[ \n]|$)
+        patterns:
+          - include: 'source.mcfunction#nbt_path.property'
+      - begin: '\b(storage)\b ([_[:alpha:]][_\-.[:alnum:]]*(?::[_\-.[:alnum:]]+(?:/[_\-.[:alnum:]]+)*)?)\s'
+        beginCaptures:
+          '1': { name: entity.name.type.mcf }
+          '2': { name: variable.other.storage.mcf}
+        end: (?<=[ \n]|$)
+        patterns:
+          - include: 'source.mcfunction#nbt_path.property'
+      - begin: '((?:\@|\#).+)::'
+        beginCaptures:
+          '1': { patterns: [ {include: '#selector'} ] }
+        end: (?<=[ \n]|$)
+        patterns:
+          - include: 'source.mcfunction#nbt_path.property'
+      - begin: '\b(entity)\b ((?:\@|\#).+)\s'
+        beginCaptures:
+          '1': { name: entity.name.type.mcf }
+          '2': { patterns: [ {include: '#selector'} ]  }
+        end: (?<=[ \n]|$)
+        patterns:
+          - include: 'source.mcfunction#nbt_path.property'
+      - match: \b(block)\b
+        name: entity.name.type.mcf
+      - include: '#selector'
+      - include: 'source.mcfunction#command.token.coordinate'
+      # - include: 'source.mcfunction#nbt_path.property'
+  
+
+  data-operators:
+    patterns:
+      - name: keyword.operator.nbt.mcf
+        match: \.\.[0-9]+
+      - name: keyword.operator.nbt.mcf
+        match: \|=|\.\.|=
+      - include: '#assign-operator'
+  # position-identifier:
+  #   patterns:
+  #     - name: keyword.operator.position.mcf
+  #       match: ~|\^
+  common-operators:
+    patterns:
+      - name: keyword.operator.common.mcf
+        match: \+=|-=|\*\+|\+|\*
+      - include: '#assign-operator'
+  exist-operators:
+    patterns:
+      - name: keyword.operator.logical.mcf
+        match: \!|&&|\|\|
+      - name: keyword.operator.bitwise.mcf
+        match: \&|\|
+      
+  scb-compare-operators:
+    patterns:
+      - name: keyword.operator.comparison.mcf
+        match: ==|!=
+      - name: keyword.operator.relational.mcf
+        match: <=|>=|<|>
+  scb-operators:
+    patterns:
+      - name: keyword.operator.assignment.compound.mcf
+        match: \*=|/=|%=|\+=|-=|:=
+      - name: keyword.operator.value.shift.mcf
+        match: <<|>>|><
+      - name: keyword.operator.arithmetic.mcf
+        match: '%|\*|/|-|\+'
+      - include: '#assign-operator'
+  assign-operator:
+    patterns:
+      - name: keyword.operator.assignment.mcf
+        match: \=
+

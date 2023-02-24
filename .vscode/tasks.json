@@ -1,0 +1,51 @@
+// See https://go.microsoft.com/fwlink/?LinkId=733558
+// for the documentation about the tasks.json format
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "npm: yml2js",
+			"type": "npm",
+			"script": "yml2js",
+			"problemMatcher": [],
+			"detail": "npx js-yaml syntaxes/mcf.tmLanguage.yaml > syntaxes/mcf.tmLanguage.json",
+			"group": {
+				"kind": "build"
+			}
+		},
+		{
+			"label": "npm: watch",
+			"type": "npm",
+			"script": "watch",
+			"problemMatcher": "$tsc-watch",
+			"isBackground": true,
+			"presentation": {
+				"reveal": "never"
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+		{
+			"label": "npm: require2import",
+			"type": "npm",
+			"script": "require2import",
+			"problemMatcher": [],
+			"detail": "node ./src/lib/RequireToImport.js ./out",
+			"group": {
+				"kind": "build"
+			},
+			"dependsOn":[
+				"npm: watch"
+			]
+		},
+		{
+			"label": "build",
+			"dependsOn":[
+				"npm: yml2js",
+				"npm: require2import"
+			]
+		}
+	]
+}
